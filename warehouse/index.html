@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>倉庫點清</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: 手機一欄：選位置 → 這一層已記的東西 → 新增一樣 → 底部固定的狀態列 */
+:root {
+  --bg: #f4f4f4; --surface: #ffffff; --ink: #191414; --muted: #6f6a6a; --line: #e3e0e0; --soft: #efeded;
+  --kb: #4100f5; --cit: #cdf564; --aq: #9bf0e1; --fu: #f037a5; --ta: #ff4632; --on-kb: #ffffff;
+  --go1: #e4f7c2; --go2: #ffe1ef; --go3: #ffd9d3;
+  --f-num: "Outfit", "Noto Sans TC", sans-serif;
+  --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141212; --surface: #1f1c1c; --ink: #f1eeee; --muted: #a9a3a3; --line: #353030; --soft: #2a2626;
+  --kb: #8f73ff; --on-kb: #141212; --go1: #34401f; --go2: #4a2638; --go3: #4d2620; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.6; margin: 0; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 24px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+h1 { font-size: clamp(26px, 6vw, 34px); font-weight: 900; line-height: 1.25; margin: 0; }
+h2 { font-size: 19px; font-weight: 900; margin: 0; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.box { background: var(--surface); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+.grp { display: grid; gap: 6px; }
+.grp b { font-size: 13px; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1.5px solid var(--line); background: var(--soft); color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; padding: 6px 12px; border-radius: 99px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
+.chip small { font-family: var(--f-num); font-size: 12px; color: var(--muted); font-weight: 700; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip[aria-pressed="true"] small { color: inherit; opacity: .7; }
+.chip:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--kb); outline-offset: 2px; }
+.shelf-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.shelf-h small { color: var(--muted); font-weight: 700; }
+.list { display: grid; gap: 8px; }
+.item { background: var(--surface); border-radius: 16px; padding: 12px 14px; display: grid; gap: 8px; border-left: 6px solid var(--line); }
+.item.k1 { border-left-color: #9ed36a; } .item.k2 { border-left-color: var(--fu); } .item.k3 { border-left-color: var(--ta); }
+.item-t { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.bag { font-family: var(--f-num); font-weight: 800; font-size: 12.5px; background: var(--soft); border-radius: 8px; padding: 1px 8px; }
+.item-t b { font-size: 16px; }
+.item-t span.s { color: var(--muted); font-size: 13.5px; }
+.meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); }
+.meta em { font-style: normal; font-family: var(--f-num); font-weight: 800; color: var(--ink); font-size: 15px; }
+.go { display: flex; gap: 6px; flex-wrap: wrap; }
+.go .chip { font-size: 13px; padding: 4px 10px; }
+.go .chip[aria-pressed="true"][data-v="搬去潮州"] { background: var(--go1); border-color: #9ed36a; color: var(--ink); }
+.go .chip[aria-pressed="true"][data-v="出清"] { background: var(--go2); border-color: var(--fu); color: var(--ink); }
+.go .chip[aria-pressed="true"][data-v="丟掉"] { background: var(--go3); border-color: var(--ta); color: var(--ink); }
+.del { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; justify-self: end; padding: 0 4px; }
+.field { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+input { font: inherit; font-size: 16px; color: var(--ink); background: var(--soft); border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 11px; min-width: 0; width: 100%; }
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.g3 { display: grid; grid-template-columns: 0.8fr 1fr 1fr; gap: 8px; }
+.btn { border: 0; background: var(--kb); color: var(--on-kb); font: inherit; font-weight: 800; font-size: 16px; padding: 12px 20px; border-radius: 99px; cursor: pointer; }
+.btn:disabled { opacity: .45; cursor: default; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 2px; }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--ink); color: var(--bg); padding: 10px max(16px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13.5px; }
+.bar b { font-family: var(--f-num); font-size: 16px; }
+.bar button { border: 0; background: var(--cit); color: #191414; font: inherit; font-weight: 800; font-size: 13.5px; padding: 7px 14px; border-radius: 99px; cursor: pointer; }
+.dot { width: 8px; height: 8px; border-radius: 99px; display: inline-block; background: #9ed36a; margin-right: 6px; }
+.dot.off { background: var(--ta); }
+.toast { position: fixed; left: 50%; bottom: 70px; transform: translateX(-50%); background: var(--kb); color: var(--on-kb); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: 14px; z-index: 9; }
+.warn { background: var(--go3); border-radius: 14px; padding: 12px 14px; font-size: 14px; }
+@media (max-width: 380px) { .g3 { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:6px">
+    <h1>倉庫點清</h1>
+    <p class="muted">選位置 → 一樣一樣記。記完自動存進試算表。</p>
+  </header>
+
+  <p class="warn" id="noConn" hidden>還沒連上試算表，現在先不能記。</p>
+
+  <section class="box" id="pick"></section>
+
+  <section style="display:grid;gap:10px" id="shelf" hidden>
+    <div class="shelf-h"><h2 id="shelfName"></h2><small id="shelfSum"></small></div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <section class="box" id="form" hidden>
+    <h2>新增一樣</h2>
+    <div class="g3">
+      <label class="field">袋號<input id="fBag" type="number" inputmode="numeric" min="0"></label>
+      <label class="field">數量<input id="fQty" type="number" inputmode="numeric" min="0"></label>
+      <label class="field">點數<input id="fPts" type="number" inputmode="numeric" min="0" placeholder="選填"></label>
+    </div>
+    <label class="field">品名<input id="fName" placeholder="例：恐龍盲盒"></label>
+    <label class="field">款式／系列<input id="fSer" placeholder="顏色、尺寸，沒有就空著"></label>
+    <div class="field">去向<div class="go" id="fGo"></div></div>
+    <button class="btn" id="add" type="button">新增</button>
+  </section>
+</div>
+
+<div class="bar"><span><span class="dot off" id="dot"></span><span id="status">連線中…</span></span><span>已記 <b id="total">0</b> 樣</span><button id="reload" type="button">重新整理</button></div>
+
+<script>
+(() => {
+  const URL_ = 'SCRIPT_URL_HERE';
+  const ZONES = [['倉庫', ['A-1','A-2','A-3','A-4','A-5','B-1','B-2','B-3','B-4','B-5','B-6','C-1','C-2','C-3','C-4','C-5','C-6','D-1','D-2','D-3','D-4','D-5','D-6'], '倉庫 '], ['一樓陳列', 'ABCDEFGHIJ'.split(''), '1F 陳列 '], ['二樓陳列', 'ABCD'.split(''), '2F 陳列 ']];
+  const GO = ['搬去潮州', '出清', '丟掉', '還沒決定'];
+  const GOC = { '搬去潮州': 'k1', '出清': 'k2', '丟掉': 'k3' };
+  const $ = id => document.getElementById(id);
+  const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const toast = m => { const t = el('div', 'toast', m); document.body.append(t); setTimeout(() => t.remove(), 1600); };
+  const live = URL_.startsWith('https://');
+  let rows = [], pos = null, goPick = '還沒決定';
+  try { pos = localStorage.getItem('eggy_wh_pos'); } catch (e) {}
+
+  async function api(body) {
+    const r = body ? await fetch(URL_, { method: 'POST', body: JSON.stringify(body) }) : await fetch(URL_);
+    const j = await r.json(); if (!j.ok) throw new Error(j.error || 'fail'); return j;
+  }
+  const setStatus = (ok, t) => { $('dot').className = 'dot' + (ok ? '' : ' off'); $('status').textContent = t; };
+
+  async function load() {
+    if (!live) { $('noConn').hidden = false; setStatus(false, '還沒連上'); drawPick(); return; }
+    setStatus(false, '讀取中…');
+    try { const j = await api(); rows = j.rows; setStatus(true, '已連上試算表'); }
+    catch (e) { setStatus(false, '讀不到，按重新整理'); }
+    drawPick(); drawShelf();
+  }
+  const cnt = p => rows.filter(r => r.pos === p).length;
+
+  function drawPick() {
+    const box = $('pick'); box.innerHTML = '';
+    ZONES.forEach(([name, list, pre]) => {
+      const g = el('div', 'grp'); g.append(el('b', '', name)); const w = el('div', 'chips');
+      list.forEach(x => { const p = pre + x; const b = el('button', 'chip'); b.type = 'button'; b.append(document.createTextNode(x)); const n = cnt(p); if (n) b.append(el('small', '', String(n)));
+        b.setAttribute('aria-pressed', String(pos === p)); b.addEventListener('click', () => { pos = p; try { localStorage.setItem('eggy_wh_pos', p); } catch (e) {} drawPick(); drawShelf(); $('shelf').scrollIntoView({ behavior: 'smooth', block: 'start' }); }); w.append(b); });
+      g.append(w); box.append(g);
+    });
+    $('total').textContent = rows.length;
+  }
+
+  function goChips(cur, on) { const w = el('div', 'go'); GO.forEach(v => { const b = el('button', 'chip', v); b.type = 'button'; b.dataset.v = v; b.setAttribute('aria-pressed', String(cur === v)); b.addEventListener('click', () => { on(v); [...w.children].forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === v))); }); w.append(b); }); return w; }
+
+  function drawShelf() {
+    if (!pos) return;
+    $('shelf').hidden = false; $('form').hidden = !live; $('shelfName').textContent = pos;
+    const list = $('list'); list.innerHTML = '';
+    const mine = rows.filter(r => r.pos === pos);
+    const bags = new Set(mine.map(r => r.bag).filter(x => x !== '' && x != null));
+    $('shelfSum').textContent = mine.length ? bags.size + ' 袋・' + mine.length + ' 樣' : '還沒記';
+    if (!mine.length) list.append(el('p', 'empty', '這一層還沒有東西，從下面新增。'));
+    mine.forEach(r => {
+      const it = el('div', 'item ' + (GOC[r.go] || ''));
+      const t = el('div', 'item-t'); if (r.bag !== '' && r.bag != null) t.append(el('span', 'bag', '袋 ' + r.bag)); t.append(el('b', '', r.name)); if (r.ser) t.append(el('span', 's', r.ser)); it.append(t);
+      const m = el('div', 'meta'); const q = el('span'); q.append(document.createTextNode('數量 '), el('em', '', r.qty === '' ? '—' : Number(r.qty).toLocaleString())); m.append(q);
+      if (r.pts !== '' && r.pts != null) { const p = el('span'); p.append(document.createTextNode('點數 '), el('em', '', Number(r.pts).toLocaleString())); m.append(p); }
+      it.append(m);
+      it.append(goChips(r.go, async v => { const old = r.go; r.go = v; it.className = 'item ' + (GOC[v] || ''); try { await api({ action: 'update', row: r.row, data: { go: v } }); toast('已更新'); } catch (e) { r.go = old; toast('沒存到，再試一次'); drawShelf(); } }));
+      const del = el('button', 'del', '刪除'); del.type = 'button';
+      del.addEventListener('click', async () => { if (!del.dataset.arm) { del.dataset.arm = '1'; del.textContent = '再按一次刪除'; del.style.color = 'var(--ta)'; setTimeout(() => { if (del.isConnected) { delete del.dataset.arm; del.textContent = '刪除'; del.style.color = ''; } }, 3000); return; }
+        try { await api({ action: 'delete', row: r.row }); rows = rows.filter(x => x !== r); toast('已刪除'); drawPick(); drawShelf(); } catch (e) { toast('沒刪到，再試一次'); } });
+      it.append(del); list.append(it);
+    });
+    const lastBag = [...bags].map(Number).filter(n => !isNaN(n)).sort((a, b) => b - a)[0];
+    if ($('fBag').value === '' && lastBag != null) $('fBag').value = lastBag;
+  }
+
+  const fGo = $('fGo'); fGo.append(goChips(goPick, v => { goPick = v; }));
+  $('add').addEventListener('click', async () => {
+    const name = $('fName').value.trim(); if (!name) { $('fName').focus(); toast('先填品名'); return; }
+    const num = id => { const v = $(id).value; return v === '' ? '' : Number(v); };
+    const item = { pos, bag: num('fBag'), name, ser: $('fSer').value.trim(), qty: num('fQty'), pts: num('fPts'), go: goPick };
+    const b = $('add'); b.disabled = true; b.textContent = '存進試算表中…';
+    try { const j = await api({ action: 'add', item }); rows.push(Object.assign({ row: j.row }, item)); toast('已新增');
+      ['fName', 'fSer', 'fQty', 'fPts'].forEach(id => $(id).value = ''); drawPick(); drawShelf(); $('fName').focus(); }
+    catch (e) { toast('沒存到，再按一次新增'); }
+    b.disabled = false; b.textContent = '新增';
+  });
+  $('reload').addEventListener('click', load);
+  load();
+})();
+</script>
+</body>
+</html>
