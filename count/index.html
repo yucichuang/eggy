@@ -22,7 +22,7 @@
   --kb: #8f73ff; --on-kb: #141212; --fu: #f56bbd; --ta: #ff6f5f; color-scheme: dark }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.65; margin: 0; }
-.wrap { max-width: 720px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 24px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
 h1 { font-size: clamp(26px, 6vw, 34px); font-weight: 900; line-height: 1.25; margin: 0; }
 h2 { font-size: 19px; font-weight: 900; margin: 0; }
 h3 { font-size: 16px; font-weight: 800; margin: 0; }
@@ -64,7 +64,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--kb); outlin
 .btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn { border: 0; background: var(--cit); color: #191414; font: inherit; font-weight: 800; font-size: 16px; padding: 12px 20px; border-radius: 99px; cursor: pointer; }
 .btn.ghost { background: transparent; color: inherit; box-shadow: inset 0 0 0 1.5px currentColor; font-size: 14px; padding: 10px 16px; }
-.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: 14px; }
+.toast { position: fixed; left: 50%; top: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: 14px; }
 @media (max-width: 420px) { .pl { grid-template-columns: 78px minmax(0, 1fr); } .lv { gap: 4px; } }
 </style>
 </head>
