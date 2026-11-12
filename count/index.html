@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>彈珠代幣盤點</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: 手機一欄：機台怎麼算 → 盤點表（依地點）→ 機台內彈珠→ 總計與回報 */
+:root {
+  --bg: #f4f4f4; --surface: #ffffff; --ink: #191414; --muted: #6f6a6a; --line: #e3e0e0; --soft: #efeded;
+  --kb: #4100f5; --cit: #cdf564; --aq: #9bf0e1; --fu: #f037a5; --ta: #ff4632; --on-kb: #ffffff;
+  --f-num: "Outfit", "Noto Sans TC", sans-serif;
+  --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141212; --surface: #1f1c1c; --ink: #f1eeee; --muted: #a9a3a3; --line: #353030; --soft: #2a2626;
+  --kb: #8f73ff; --on-kb: #141212; --fu: #f56bbd; --ta: #ff6f5f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141212; --surface: #1f1c1c; --ink: #f1eeee; --muted: #a9a3a3; --line: #353030; --soft: #2a2626;
+  --kb: #8f73ff; --on-kb: #141212; --fu: #f56bbd; --ta: #ff6f5f; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.65; margin: 0; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+h1 { font-size: clamp(26px, 6vw, 34px); font-weight: 900; line-height: 1.25; margin: 0; }
+h2 { font-size: 19px; font-weight: 900; margin: 0; }
+h3 { font-size: 16px; font-weight: 800; margin: 0; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.plan { display: grid; gap: 8px; }
+.pl { background: var(--surface); border-radius: 16px; padding: 12px 14px; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: start; border-left: 6px solid var(--c); }
+.pl b { font-family: var(--f-num); font-size: 15px; }
+.pl small { display: block; color: var(--muted); font-size: 12.5px; }
+.box { background: var(--surface); border-radius: 18px; padding: 14px 16px; display: grid; gap: 8px; }
+.box ul { margin: 0; padding-left: 1.2em; display: grid; gap: 3px; }
+.say { background: var(--cit); color: #191414; border-radius: 18px; padding: 14px 16px; display: grid; gap: 4px; }
+.field { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.inrow { display: flex; align-items: center; gap: 6px; }
+input { font: inherit; font-size: 16px; color: var(--ink); background: var(--soft); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 10px; min-width: 0; width: 100%; }
+input:focus-visible, button:focus-visible { outline: 2px solid var(--kb); outline-offset: 2px; }
+.u { color: var(--muted); font-weight: 700; font-size: 14px; white-space: nowrap; }
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.res { font-size: 13.5px; color: var(--muted); }
+.res b { font-family: var(--f-num); font-size: 17px; color: var(--kb); }
+.zone { display: grid; gap: 8px; }
+.zone-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.zone-h small { color: var(--muted); font-weight: 700; }
+.row { background: var(--surface); border-radius: 16px; padding: 12px 14px; display: grid; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1.5px solid var(--line); background: var(--soft); color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; padding: 5px 12px; border-radius: 99px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.lv { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.lv label { display: grid; gap: 2px; font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; }
+.lv input { text-align: center; padding: 8px 4px; }
+.del { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; justify-self: end; padding: 0 4px; }
+.adds { display: flex; gap: 8px; flex-wrap: wrap; }
+.add { flex: 1; border: 1.5px dashed var(--line); background: none; color: var(--ink); font: inherit; font-weight: 700; font-size: 14px; padding: 9px 10px; border-radius: 14px; cursor: pointer; white-space: nowrap; }
+.tot { background: var(--ink); color: var(--bg); border-radius: 20px; padding: 16px 18px; display: grid; gap: 12px; }
+.tot-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tot-g div { background: rgba(127,127,127,.18); border-radius: 14px; padding: 10px 12px; }
+.tot-g small { display: block; font-size: 12.5px; opacity: .75; }
+.tot-g b { font-family: var(--f-num); font-size: 26px; font-weight: 800; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 0; background: var(--cit); color: #191414; font: inherit; font-weight: 800; font-size: 16px; padding: 12px 20px; border-radius: 99px; cursor: pointer; }
+.btn.ghost { background: transparent; color: inherit; box-shadow: inset 0 0 0 1.5px currentColor; font-size: 14px; padding: 10px 16px; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: 14px; }
+@media (max-width: 420px) { .pl { grid-template-columns: 78px minmax(0, 1fr); } .lv { gap: 4px; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <h1>彈珠、代幣盤點</h1>
+  </header>
+
+
+  <section class="say">
+    <h3>客人來了</h3>
+    <p>開店時先留一小桶彈珠、一袋代幣在一樓櫃檯給客人用，其他的不要動。正在點的停下來先招呼，記住點到哪再接著做。</p>
+  </section>
+
+  <section class="box">
+    <h3>機台怎麼算</h3>
+    <ul>
+      <li><b>代幣機</b>：先清空全部代幣機的代幣。</li>
+      <li><b>彈珠機</b>：嘉年華、訓練窟全部補滿彈珠，每款挑一台倒出來秤，就知道一台補滿時有多少顆。</li>
+    </ul>
+  </section>
+
+  <section class="zone">
+    <h2>先秤一次</h2>
+    <div class="row">
+      <p class="field">扣掉盒子重量後</p>
+      <div class="g2">
+        <label class="field">100 顆彈珠<div class="inrow"><input id="m100" type="number" inputmode="decimal" min="0" placeholder="例：450"><span class="u">克</span></div></label>
+        <label class="field">100 枚代幣<div class="inrow"><input id="c100" type="number" inputmode="decimal" min="0" placeholder="例：600"><span class="u">克</span></div></label>
+      </div>
+    </div>
+  </section>
+
+  <div id="zones" style="display:grid;gap:22px"></div>
+
+  <section class="zone">
+    <div class="zone-h"><h2>機台內彈珠</h2><small id="machSum"></small></div>
+    <div id="mach" style="display:grid;gap:8px"></div>
+  </section>
+
+  <section class="tot" aria-live="polite">
+    <h2 style="color:inherit">總計（推估）</h2>
+    <div class="tot-g">
+      <div><small>彈珠</small><b id="tm">0</b> 顆<small id="tmk"></small></div>
+      <div><small>代幣</small><b id="tc">0</b> 枚<small id="tck"></small></div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="copy" type="button">複製結果，貼到 LINE</button>
+      <button class="btn ghost" id="reset" type="button">清空</button>
+    </div>
+    <p style="font-size:12.5px;opacity:.75">數字存在這支手機，關掉再開還在。兩個人分頭點，先講好誰點哪一層。</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  const ZONES = [['W', '倉庫', false], ['2F', '二樓', false], ['1F', '一樓', false]];
+  const MODELS = ['嘉年華', '訓練窟'];
+  const LV = [['滿', 1], ['3/4', .75], ['一半', .5], ['1/4', .25], ['空', 0]];
+  const KEY = 'eggy_count_v3';
+  let S = { m100: '', c100: '', rows: [], mach: {} };
+  try { const x = JSON.parse(localStorage.getItem(KEY) || 'null'); if (x && Array.isArray(x.rows)) S = Object.assign(S, x); } catch (e) {}
+  S.rows = S.rows.filter(r => r.t !== 'm'); S.mach = S.mach || {}; MODELS.forEach(k => { S.mach[k] = Object.assign({ full: '', f1: '', f2: '' }, S.mach[k] || {}); });
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  const $ = id => document.getElementById(id);
+  const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+  const num = v => { const n = parseFloat(v); return isFinite(n) && n > 0 ? n : 0; };
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  const uM = () => num(S.m100) / 100, uC = () => num(S.c100) / 100;
+  const bucketCnt = r => { const u = r.kind === 'c' ? uC() : uM(); return u ? num(r.g) / u : 0; };
+  const machN = r => LV.reduce((s, x, i) => s + num((r.lv || [])[i]), 0);
+  const machCnt = r => uM() ? LV.reduce((s, [l, f], i) => s + num((r.lv || [])[i]) * f, 0) * num(r.full) / uM() : 0;
+  const toast = msg => { const t = el('div', 'toast', msg); document.body.append(t); setTimeout(() => t.remove(), 1800); };
+  const numIn = (val, on, ph) => { const i = el('input'); i.type = 'number'; i.inputMode = 'decimal'; i.min = '0'; i.value = val || ''; if (ph) i.placeholder = ph; i.addEventListener('input', () => on(i.value)); return i; };
+  const withU = (inp, u) => { const r = el('div', 'inrow'); r.append(inp, el('span', 'u', u)); return r; };
+  const bucketNo = r => { const same = S.rows.filter(x => x.z === r.z && x.t === 'b' && x.kind === r.kind); return same.indexOf(r) + 1; };
+  const bucketName = r => '第 ' + bucketNo(r) + ' 桶' + (r.kind === 'c' ? '代幣' : '彈珠');
+
+  const draws = [];
+  function zoneBox([z, name, hasMach]) {
+    const sec = el('section', 'zone'); const hd = el('div', 'zone-h'); const sum = el('small'); hd.append(el('h2', '', name), sum); sec.append(hd);
+    const list = el('div'); list.style.cssText = 'display:grid;gap:8px'; sec.append(list);
+    const draw = () => {
+      list.innerHTML = '';
+      S.rows.filter(r => r.z === z).forEach(r => {
+        const row = el('div', 'row'); const res = el('p', 'res');
+        const upd = () => { res.innerHTML = '';
+          if (r.t === 'm') { if (!uM()) { res.textContent = '先在上面填 100 顆彈珠的重量'; } else res.append(document.createTextNode(machN(r) + ' 台・約 '), el('b', '', fmt(machCnt(r))), document.createTextNode(' 顆')); }
+          else { if (!(r.kind === 'c' ? uC() : uM())) res.textContent = '先在上面填 100 ' + (r.kind === 'c' ? '枚代幣' : '顆彈珠') + '的重量'; else res.append(document.createTextNode('約 '), el('b', '', fmt(bucketCnt(r))), document.createTextNode(r.kind === 'c' ? ' 枚' : ' 顆')); }
+          total(); };
+        const top = el('div', 'zone-h');
+        if (r.t === 'm') {
+          const nm = el('input'); nm.placeholder = '彈珠機款式，例：大台'; nm.value = r.name || ''; nm.style.fontWeight = '700'; nm.addEventListener('input', () => { r.name = nm.value; save(); });
+          top.append(nm); row.append(top);
+          const f = el('label', 'field', '這款補滿後倒出來（扣掉盒子）'); f.append(withU(numIn(r.full, v => { r.full = v; save(); upd(); }), '克')); row.append(f);
+          row.append(el('div', 'field', '其他台打開看，各有幾台：'));
+          const lv = el('div', 'lv'); r.lv = r.lv || ['', '', '', '', ''];
+          LV.forEach(([l], i) => { const lb = el('label', '', l); lb.append(numIn(r.lv[i], v => { r.lv[i] = v; save(); upd(); }, '0')); lv.append(lb); });
+          row.append(lv);
+        } else {
+          top.append(el('h3', '', bucketName(r))); row.append(top);
+          const f = el('label', 'field', '重量（扣掉桶子）'); f.append(withU(numIn(r.g, v => { r.g = v; save(); upd(); }), '克')); row.append(f);
+        }
+        const del = el('button', 'del', '刪除'); del.type = 'button'; del.addEventListener('click', () => { if (!del.dataset.arm) { del.dataset.arm = '1'; del.textContent = '再按一次刪除'; del.style.color = 'var(--ta)'; del.style.fontWeight = '700'; setTimeout(() => { if (del.isConnected) { delete del.dataset.arm; del.textContent = '刪除'; del.style.color = ''; del.style.fontWeight = ''; } }, 3000); return; } S.rows = S.rows.filter(x => x !== r); save(); draws.forEach(d => d()); total(); });
+        row.append(res, del); list.append(row); upd();
+      });
+      const n = S.rows.filter(r => r.z === z).length; sum.textContent = n ? n + ' 筆' : '還沒點';
+    };
+    const adds = el('div', 'adds');
+    const mk = (label, row) => { const b = el('button', 'add', label); b.type = 'button'; b.addEventListener('click', () => { S.rows.push(Object.assign({ z }, row)); save(); draw(); total(); const ins = list.querySelectorAll('.row input[type=number]'); }); adds.append(b); };
+    mk('＋ 一桶彈珠', { t: 'b', kind: 'm', g: '' });
+    mk('＋ 一桶代幣', { t: 'b', kind: 'c', g: '' });
+    if (hasMach) mk('＋ 彈珠機', { t: 'm', name: '', full: '', lv: ['', '', '', '', ''] });
+    sec.append(adds); draws.push(draw); draw(); return sec;
+  }
+  const mCnt = k => { const m = S.mach[k]; return uM() ? num(m.full) / uM() : 0; };
+  const mTot = (k, f) => mCnt(k) * num(S.mach[k][f]);
+  const machAll = () => MODELS.reduce((s, k) => s + mTot(k, 'f1') + mTot(k, 'f2'), 0);
+  const machRes = {};
+  function drawMach() {
+    const box = $('mach'); box.innerHTML = '';
+    MODELS.forEach(k => { const m = S.mach[k]; const row = el('div', 'row'); row.append(el('h3', '', k));
+      const f = el('label', 'field', '補滿的一台倒出來（扣掉盒子）'); f.append(withU(numIn(m.full, v => { m.full = v; save(); upd(); }), '克')); row.append(f);
+      const g = el('div', 'g2');
+      [['f1', '一樓幾台'], ['f2', '二樓幾台']].forEach(([fk, l]) => { const ff = el('label', 'field', l); ff.append(withU(numIn(m[fk], v => { m[fk] = v; save(); upd(); }), '台')); g.append(ff); });
+      row.append(g); const res = el('p', 'res'); row.append(res); machRes[k] = res;
+      const upd = () => { res.innerHTML = ''; if (!uM()) { res.textContent = '先在上面填 100 顆彈珠的重量'; } else if (!num(m.full)) { res.textContent = '填補滿那一台的重量'; } else res.append(document.createTextNode('一台約 ' + fmt(mCnt(k)) + ' 顆・一樓 ' + fmt(mTot(k, 'f1')) + '、二樓 ' + fmt(mTot(k, 'f2')) + '・共約 '), el('b', '', fmt(mTot(k, 'f1') + mTot(k, 'f2'))), document.createTextNode(' 顆')); total(); };
+      box.append(row); upd(); });
+  }
+  drawMach();
+  ZONES.forEach(z => $('zones').append(zoneBox(z)));
+
+  function zoneTot(z) { let m = 0, c = 0; S.rows.filter(r => r.z === z).forEach(r => { if (r.t === 'm') m += machCnt(r); else if (r.kind === 'c') c += bucketCnt(r); else m += bucketCnt(r); }); return [m, c]; }
+  function total() {
+    let m = 0, c = 0; ZONES.forEach(([z]) => { const [a, b] = zoneTot(z); m += a; c += b; }); { m += machAll(); const ms = $('machSum'); if (ms) ms.textContent = machAll() ? '約 ' + fmt(machAll()) + ' 顆' : ''; }
+    $('tm').textContent = fmt(m); $('tc').textContent = fmt(c);
+    $('tmk').textContent = uM() ? '約 ' + (m * uM() / 1000).toFixed(1) + ' 公斤' : ''; $('tck').textContent = uC() ? '約 ' + (c * uC() / 1000).toFixed(1) + ' 公斤' : '';
+  }
+  ['m100', 'c100'].forEach(k => { const i = $(k); i.value = S[k] || ''; i.addEventListener('input', () => { S[k] = i.value; save(); draws.forEach(d => d()); drawMach(); total(); }); });
+  total();
+
+  $('copy').addEventListener('click', async () => {
+    const d = new Date(); const L = ['【彈珠代幣盤點】' + (d.getMonth() + 1) + '/' + d.getDate()];
+    L.push('100 顆彈珠 ' + (S.m100 || '?') + ' 克｜100 枚代幣 ' + (S.c100 || '?') + ' 克');
+    ZONES.forEach(([z, name]) => { const rs = S.rows.filter(r => r.z === z); if (!rs.length) { L.push('■ ' + name + '：還沒點'); return; }
+      const [m, c] = zoneTot(z); L.push('■ ' + name + '：彈珠約 ' + fmt(m) + ' 顆、代幣約 ' + fmt(c) + ' 枚');
+      rs.forEach(r => { if (r.t === 'm') L.push('・彈珠機' + (r.name ? '（' + r.name + '）' : '') + ' 滿的時候 ' + (r.full || '?') + ' 克；' + machN(r) + ' 台（' + LV.map(([l], i) => num((r.lv || [])[i]) ? l + ' ' + num(r.lv[i]) : '').filter(Boolean).join('、') + '）約 ' + fmt(machCnt(r)) + ' 顆');
+        else L.push('・' + bucketName(r) + ' ' + (r.g || 0) + ' 克，約 ' + fmt(bucketCnt(r)) + (r.kind === 'c' ? ' 枚' : ' 顆')); }); });
+    L.push('■ 機台內彈珠：約 ' + fmt(machAll()) + ' 顆');
+    MODELS.forEach(k => { const m = S.mach[k]; if (num(m.full) || num(m.f1) || num(m.f2)) L.push('・' + k + '：補滿一台 ' + (m.full || '?') + ' 克（約 ' + fmt(mCnt(k)) + ' 顆）；一樓 ' + num(m.f1) + ' 台、二樓 ' + num(m.f2) + ' 台，共約 ' + fmt(mTot(k, 'f1') + mTot(k, 'f2')) + ' 顆'); });
+    L.push('合計：彈珠約 ' + $('tm').textContent + ' 顆、代幣約 ' + $('tc').textContent + ' 枚');
+    const txt = L.join('\n');
+    try { await navigator.clipboard.writeText(txt); toast('已複製，去 LINE 貼上'); }
+    catch (e) { const ta = el('textarea'); ta.value = txt; ta.style.cssText = 'width:100%;min-height:200px'; $('copy').closest('.tot').append(ta); ta.select(); toast('長按下面的文字複製'); }
+  });
+  $('reset').addEventListener('click', () => { const rb = $('reset'); if (!rb.dataset.arm) { rb.dataset.arm = '1'; rb.textContent = '再按一次清空全部'; setTimeout(() => { delete rb.dataset.arm; rb.textContent = '清空'; }, 3000); return; } delete rb.dataset.arm; rb.textContent = '清空'; S = { m100: '', c100: '', rows: [], mach: {} }; MODELS.forEach(k => { S.mach[k] = { full: '', f1: '', f2: '' }; }); save(); drawMach(); ['m100', 'c100'].forEach(k => $(k).value = ''); draws.forEach(d => d()); total(); });
+})();
+</script>
+
+
+</body>
+</html>
